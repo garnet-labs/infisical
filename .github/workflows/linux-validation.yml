@@ -1,0 +1,31 @@
+name: Linux validation
+
+on:
+  push:
+    branches: [ci-linux-validation]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  validation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: "actions/checkout@v6"
+        with:
+          persist-credentials: false
+      - uses: "garnet-org/action@v2.6.0"
+      - uses: "actions/setup-go@v5"
+        with:
+          go-version-file: "backend-go/go.mod"
+          cache: false
+      - name: "Install dependencies"
+        run: |
+          go mod download
+        working-directory: "backend-go"
+      - name: "Run checks"
+        run: |
+          make test-unit
+        working-directory: "backend-go"
